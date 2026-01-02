@@ -1,3 +1,4 @@
+import pandas as pd
 from flask import Flask
 import pickle
 from flask import request, jsonify
