@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Phishing URL Detection</title>
+</head>
+<body>
+  <h2>Phishing URL Detection (Demo)</h2>
+
+  <form method="post" action="/check">
+    <input type="text" name="url" placeholder="Enter URL" size="50" value="{{ url if url else '' }}" required />
+    <br><br>
+    <button type="submit">Check URL</button> <br>
+  </form>
+
+  <a href="/check">
+    <button type="button">Reload Page</button>
+  </a>
+
+  {% if result %}
+    <h3>Result: {{ result }}</h3>
+  {% endif %}
+
+  <p><i>This interface is for academic demonstration only.</i></p>
+</body>
+</html>
