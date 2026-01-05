@@ -21,6 +21,26 @@ def is_valid_url(url):
     except:
         return False
 
+def rule_based_detection(url):
+    score = 0
+
+    if len(url) > 75:
+        score += 1
+    if "@" in url:
+        score += 1
+    if url.count(".") > 4:
+        score += 1
+    if "-" in url:
+        score += 1
+    if not url.startswith("https"):
+        score += 1
+    if any(word in url.lower() for word in ["login", "verify", "update", "secure", "account"]):
+        score += 1
+
+    return "Phishing" if score >= 2 else "Legitimate"
+
+
+
 @app.route("/")
 def home():
     return redirect(url_for("check"))
@@ -32,28 +52,33 @@ def check():
 
     if request.method == "POST":
         url = request.form.get("url", "")
+        mode = request.form.get("mode", "rule")  # rule = default
 
         if not is_valid_url(url):
-            return render_template("index.html",
-                                   result="Invalid URL format",
-                                   url=url)
+            return render_template(
+                "index.html",
+                result="Invalid URL format",
+                url=url,
+                mode=mode
+            )
 
-        features = extract_demo_features(url)
+        # RULE-BASED (DEFAULT)
+        if mode == "rule":
+            result = rule_based_detection(url)
 
-        # Build dataframe in correct order
-        input_df = pd.DataFrame([[features.get(col, 0) for col in FEATURE_COLUMNS]],
-                                columns=FEATURE_COLUMNS)
+        # ML-BASED (EXPERIMENTAL)
+        elif mode == "ml":
+            features = extract_demo_features(url)
 
-        prediction = model.predict(input_df)[0]
+            input_df = pd.DataFrame(
+                [[features.get(col, 0) for col in FEATURE_COLUMNS]],
+                columns=FEATURE_COLUMNS
+            )
 
-        # Dataset definition:
-        # 1 = Legitimate, 0 = Phishing
-        if prediction == 1:
-            result = "Legitimate"
-        elif prediction == -1:
-            result = " phishing"
-        else:
-            result = "Suspicious URL!"
+            prediction = model.predict(input_df)[0]
+
+            # ARFF definition: 1 = Legit, -1 = Phishing
+            result = "Legitimate" if prediction == 1 else "Phishing"
 
     return render_template("index.html", result=result, url=url)
 
