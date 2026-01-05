@@ -3,49 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <title>Phishing URL Detection (Demo)</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div class="container">
-    
     <h1>Phishing URL Detection (Demo)</h1>
 
     <form method="POST">
-        <input
-            type="text"
-            name="url"
-            placeholder="Enter URL"
-            value="{{ url if url else '' }}"
-            required
-        >
-        <br><br>
-        <button type="submit" class="primary">Check URL</button>
-        <button type="reset" class="secondary" onclick="window.location.href='/check'">Reload Page</button>
+        <input type="text" name="url" placeholder="Enter URL" value="{{ url or '' }}" required>
 
-        <label>
-            <input type="radio" name="mode" value="rule" checked>
-            Rule-Based Detection (Default)
-        </label>
-        
-        <br>
-        
-        <label>
-            <input type="radio" name="mode" value="ml">ML-Based Detection (Experimental)
-        </label>
-<br><br>
+        <div class="buttons">
+            <button type="submit">Check URL</button>
+            <button type="button" onclick="window.location.href='/check'">Reload Page</button>
+        </div>
 
+        <div class="mode-toggle-container">
+    <span id="ruleLabel" class="mode-label active">Rule-Based</span>
+
+    <label class="switch">
+        <input type="checkbox" id="modeToggle" name="mode"
+               value="ml" {% if mode == 'ml' %}checked{% endif %}>
+        <span class="slider"></span>
+    </label>
+
+    <span id="mlLabel" class="mode-label {% if mode == 'ml' %}active{% endif %}">
+        ML-Based
+    </span>
+</div>
+
+<!-- Hidden fallback for rule -->
+<input type="hidden" name="mode" id="modeHidden" value="{{ mode or 'rule' }}">
     </form>
 
-   {% if result %}
-<div class="result {{ 'phishing' if result == 'Phishing' else 'legitimate' }}">
-    Result: {{ result }}
-</div>
-{% endif %}
+    {% if result %}
+        <div class="result {% if result == 'Phishing' %}phishing{% else %}legitimate{% endif %}">
+            Result: {{ result }}
+        </div>
+    {% endif %}
 
-
-    <div class="note">
-    This interface is for academic demonstration only.
+    <div class="footer-note">
+        This interface is for academic demonstration only.
     </div>
 </div>
+
+
+
+<script>
+const toggle = document.getElementById("modeToggle");
+const ruleLabel = document.getElementById("ruleLabel");
+const mlLabel = document.getElementById("mlLabel");
+const hiddenMode = document.getElementById("modeHidden");
+
+function updateModeUI() {
+    if (toggle.checked) {
+        mlLabel.classList.add("active");
+        ruleLabel.classList.remove("active");
+        hiddenMode.value = "ml";
+    } else {
+        ruleLabel.classList.add("active");
+        mlLabel.classList.remove("active");
+        hiddenMode.value = "rule";
+    }
+}
+
+toggle.addEventListener("change", updateModeUI);
+updateModeUI();
+</script>
+
+
 </body>
 </html>

@@ -49,6 +49,7 @@ def home():
 def check():
     result = None
     url = ""
+    mode = "rule" 
 
     if request.method == "POST":
         url = request.form.get("url", "")
@@ -62,11 +63,11 @@ def check():
                 mode=mode
             )
 
-        # RULE-BASED (DEFAULT)
+        # 🔹 RULE-BASED (DEFAULT)
         if mode == "rule":
             result = rule_based_detection(url)
 
-        # ML-BASED (EXPERIMENTAL)
+        # 🔹 ML-BASED (EXPERIMENTAL)
         elif mode == "ml":
             features = extract_demo_features(url)
 
@@ -80,7 +81,12 @@ def check():
             # ARFF definition: 1 = Legit, -1 = Phishing
             result = "Legitimate" if prediction == 1 else "Phishing"
 
-    return render_template("index.html", result=result, url=url)
+    return render_template(
+    "index.html",
+    result=result,
+    url=url,
+    mode=mode
+)
 
 if __name__ == "__main__":
     app.run(debug=True)
