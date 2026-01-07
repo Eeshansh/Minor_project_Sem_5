@@ -63,11 +63,11 @@ def check():
                 mode=mode
             )
 
-        # RULE-BASED (DEFAULT)
+        # 🔹 RULE-BASED (DEFAULT)
         if mode == "rule":
             result = rule_based_detection(url)
 
-        # ML-BASED (EXPERIMENTAL)
+        # 🔹 ML-BASED (EXPERIMENTAL)
         elif mode == "ml":
             features = extract_demo_features(url)
 
